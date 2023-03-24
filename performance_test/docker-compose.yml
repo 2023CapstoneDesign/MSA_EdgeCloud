@@ -1,0 +1,6 @@
+services:
+  pytorch_service:
+    # image: node:16-alpine
+    build: .
+    ports:
+      - "8080:3000"
