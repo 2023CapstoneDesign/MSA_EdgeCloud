@@ -4,12 +4,13 @@ WORKDIR /torchApp
 
 COPY . .
 
-RUN apt update && apt upgrade
+RUN apt -y update && apt -y upgrade
 RUN apt install -y python3 python3-pip libgl1-mesa-glx
-RUN pip install numpy timm opencv-python pillow six
+RUN pip install --no-cache-dir numpy opencv-python pillow six
 
-RUN pip install torch
-RUN pip install torchvision
+RUN pip install --no-cache-dir torch==1.10.0
+RUN pip install --no-cache-dir torchvision==0.11.1
+RUN pip install --no-cache-dir timm
 
 RUN npm install
 
