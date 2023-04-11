@@ -1,0 +1,13 @@
+networks:
+  performance_test_net1:
+    external: true
+
+services:
+  prometheus:
+    build: .
+    restart: always
+    ports:
+      - "9090:9090"
+    networks:
+      - performance_test_net1
+

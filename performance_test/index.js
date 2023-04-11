@@ -47,3 +47,14 @@ app.post("/check/bird", uploader.single('img'), (req, res, next)=>{
 
     res.status(200).send(result.stdout.toString());
 })
+
+const Prometheus = require('prom-client')
+
+const register = new Prometheus.Registry();
+Prometheus.collectDefaultMetrics({ register });
+
+  
+app.get('/metrics', async(req, res) => {
+  res.setHeader('Content-Type', register.contentType)
+  res.send(await register.metrics())
+})

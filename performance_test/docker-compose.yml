@@ -1,3 +1,6 @@
+networks:
+  net1:
+
 services:
   pytorch_service:
     # image: node:16-alpine
@@ -5,3 +8,5 @@ services:
     restart: always
     ports:
       - "8080:3000"
+    networks:
+      - net1
