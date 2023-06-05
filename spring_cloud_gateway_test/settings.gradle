@@ -1,0 +1,11 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = 'gateway'
+
+include 'gateway-server'
+include 'services:user-service'
+include 'services:shop-service'
