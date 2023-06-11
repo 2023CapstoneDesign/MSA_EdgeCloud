@@ -55,9 +55,3 @@ project (':services:user-service') {
         implementation("org.springframework.boot:spring-boot-starter-webflux")
     }
 }
-
-project (':services:shop-service') {
-    dependencies {
-        implementation("org.springframework.boot:spring-boot-starter-webflux")
-    }
-}
