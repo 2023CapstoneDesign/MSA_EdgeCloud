@@ -2,8 +2,17 @@ package com.example.firstservice;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,47 +47,38 @@ public class FirstServiceController {
                 env.getProperty("local.server.port"));
     }
 
-    @PostMapping("/bird")
-    public String bird(@RequestBody MultipartFile imageFile) {
-        try {
-            // 임시 폴더에 이미지 저장
-            File tempFile = File.createTempFile("image", imageFile.getOriginalFilename());
-            try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(tempFile))) {
-                stream.write(imageFile.getBytes());
-            }
 
-            // Python 파일 경로
-            String pythonScriptPath = "../../../../../../../performance_test/predict_model.py";
+    //@Value("${localhost:8080/check/bird}")
+    private String predictModelUrl = "localhost:8080/check/bird";
 
-            // 파라미터 전달을 위해 명령어 준비
-            String[] cmd = new String[3];
-            cmd[0] = "python"; // Python 인터프리터
-            cmd[1] = pythonScriptPath; // Python 파일 경로
-            cmd[2] = tempFile.getAbsolutePath(); // 이미지 파일 경로
+    @PostMapping("/upload")
+    public ResponseEntity<String> handleImageUpload(
+            @RequestParam("file") MultipartFile file,
+            @RequestHeader("Content-Type") String contentType
+    ) throws IOException {
+        // Create a temporary file
+        File tempFile = File.createTempFile("image", file.getOriginalFilename());
+        file.transferTo(tempFile);
 
-            // 명령어 실행
-            Process process = Runtime.getRuntime().exec(cmd);
+        // Prepare the request body
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", new FileSystemResource(tempFile));
 
-            // 실행 결과 읽기
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            StringBuilder output = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                output.append(line).append("\n");
-            }
+        // Set the headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-            // 프로세스 종료 대기
-            int exitCode = process.waitFor();
+        // Create the request entity
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-            // 임시 파일 삭제
-            tempFile.delete();
+        // Send the request to the prediction model
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(predictModelUrl, requestEntity, String.class);
 
-            // 결과 반환
-            return "Python script executed with output:\n" + output.toString() + "\nExit code: " + exitCode;
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-            return "Error processing the image.";
-        }
+        // Delete the temporary file
+        tempFile.delete();
+
+        return responseEntity;
     }
 }
 
