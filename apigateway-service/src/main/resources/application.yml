@@ -73,6 +73,12 @@ spring:
 #            - AddRequestHeader=first-request, first-request-header2
 #            - AddResponseHeader=first-response, first-response-header2
             - CustomFilter
+        - id: first-service
+          uri: lb://MY-FIRST-SERVICE
+          predicates:
+            - Path=/first-service/bird/**
+          filters:
+            - RewritePath=/first-service/bird/(?<path>.*), /$\{path}
         - id: second-service
           uri: lb://MY-SECOND-SERVICE
           predicates:
