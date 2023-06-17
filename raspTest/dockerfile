@@ -1,0 +1,7 @@
+FROM public.ecr.aws/q9a8w4y6/my-torch as BASE
+
+WORKDIR /pyApp
+
+COPY ./torch_service/model/model_best.pt ./model/model_best.pt
+
+CMD ["python", "predict_model.py"]

@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  torch:
+    platform: linux/amd64
+    build:
+      context: ./torch_service
+    restart: always
+    environment:
+      TORCH_PORT: 30080
+    expose:
+      - 30080
+    # image: public.ecr.aws/q9a8w4y6/my-torch:amd64
+
+  web:
+    platform: linux/amd64
+    build:
+      context: ./nodejs_service
+    restart: always
+    ports:
+      -  "38080:3000" # external 38080
+    # image: public.ecr.aws/q9a8w4y6/my-nodejs:amd64
+
+  
+
+  

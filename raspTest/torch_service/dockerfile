@@ -1,0 +1,16 @@
+FROM python:3.11-slim
+
+WORKDIR /pyApp
+
+COPY . .
+
+ENV TORCH_PORT=30080
+
+RUN apt -y update \
+    # && apt install -y libgl1-mesa-glx libglib2.0-0 \
+    && pip install --no-cache-dir numpy opencv-python-headless pillow \
+    # && pip install --no-cache-dir torch==1.13.0+cpu torchvision==0.14.0+cpu torchaudio==0.13.0 --extra-index-url https://download.pytorch.org/whl/cpu \
+    && pip install --no-cache-dir torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu \
+    && pip install --no-cache-dir timm
+
+CMD [ "python", "predict_model.py"]
